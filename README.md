@@ -1,2 +1,2 @@
-# MUCH_WOW_2
-Platformer Edition
+# The Return Of Doge
+The un-official official sequel to the world renown doge game.
