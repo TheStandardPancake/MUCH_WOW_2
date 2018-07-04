@@ -204,7 +204,7 @@ def re_draw():
 
 def Game_Start():
     pygame.mixer.music.stop()
-    background_music = pygame.mixer.music.load("Kazoode - Sandstorm.mp3")
+    background_music = pygame.mixer.music.load("KazooSandstorm.wav")
     pygame.mixer.music.play(-1)
     global level_layout
     level_layout = pygame.image.load('background.png').convert_alpha()
