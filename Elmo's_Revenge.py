@@ -203,6 +203,9 @@ def re_draw():
     pygame.display.update()
 
 def Game_Start():
+    pygame.mixer.music.stop()
+    background_music = pygame.mixer.music.load("Kazoode - Sandstorm.mp3")
+    pygame.mixer.music.play(-1)
     global level_layout
     level_layout = pygame.image.load('background.png').convert_alpha()
     global mountaindew
