@@ -11,6 +11,8 @@ pygame.init()
 width = 1280
 height = 720
 
+#Loading in the awesome Music
+background_music = pygame.mixer.music.load("Wake Me Up Inside- Kazoo Cover.wav")
 class spurt(object):
     def __init__(self, x, y, radius, color):
         self.x = x
@@ -174,6 +176,7 @@ def update(): #So far this just lets you exit the game
             sys.exit()
 
 def Title_screen(): #Just a title screen, as the name suggests
+    pygame.mixer.music.play(-1)
     #load title screen
     global window
     window = pygame.display.set_mode((width, height))
@@ -206,7 +209,7 @@ def Game_Start():
     mountaindew = spurt(300, 494,  5, (34,245,34))
     global line
     global pos
-    
+
     while True:
         pos = pygame.mouse.get_pos()
         line = [(mountaindew.x, mountaindew.y), pos]
