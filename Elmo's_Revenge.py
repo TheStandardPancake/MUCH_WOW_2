@@ -13,8 +13,9 @@ height = 720
 
 #Loading in the awesome Music
 background_music = pygame.mixer.music.load("Wake Me Up Inside- Kazoo Cover.wav")
-class spurt(object):
+class spurt(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, color):
+        pygame.sprite.Sprite
         self.x = x
         self.y = y
         self.radius = radius
@@ -26,8 +27,16 @@ class spurt(object):
 
     @staticmethod
     def spurtpath(startx, starty, power, angle, time):
-        pass
+        velx = math.cos(angle) * power
+        vely = math.sin(angle) * power
 
+        distx = velx * time
+        disty = (vely * time) + ((-9.6 * (time)**2)/2)
+
+        newx = round(distx + startx)
+        newy = round(starty - disty)
+
+        return(newx, newy)
 
 class doritos_pile(pygame.sprite.Sprite):
     def __init__(self):
@@ -194,13 +203,33 @@ def Title_screen(): #Just a title screen, as the name suggests
         pygame.display.update()
 
 def re_draw():
+    pygame.draw.line(window, (0,0,0), line[0], line[1])
     window.blit(level_layout, (0,0))
     Doge.display()
     doritos_pile.display()
-    pygame.draw.line(window, (0,0,0), line[0], line[1])
     mountaindew.draw(window)
 
     pygame.display.update()
+
+def findAngle(pos):
+    sX = mountaindew.x
+    sY = mountaindew.y
+    try:
+        angle = math.atan((sY - pos[1]) / (sX - pos[0]))
+    except:
+        angle = math.pi / 2
+
+    if pos[1] < sY and pos[0] > sX:
+        angle = abs(angle)
+    elif pos[1] < sY and pos[0] < sX:
+        angle = math.pi - angle
+    elif pos[1] > sY and pos[0] < sX:
+        angle = math.pi + abs(angle)
+    elif pos[1] > sY and pos[0] > sX:
+        angle = (math.pi * 2) - angle
+
+    return angle
+
 
 def Game_Start():
     pygame.mixer.music.stop()
@@ -209,15 +238,47 @@ def Game_Start():
     global level_layout
     level_layout = pygame.image.load('background.png').convert_alpha()
     global mountaindew
-    mountaindew = spurt(300, 494,  5, (34,245,34))
+    mountaindew = spurt(405, 556,  5, (34,245,34))
     global line
     global pos
+    #defining variables to make the mountaindew shoot
+    x = 0
+    y = 0
+    time = 0
+    power = 0
+    angle = 0
+    shoot = False
 
     while True:
+
+        if shoot:
+            if mountaindew.y < 650 - mountaindew.radius and mountaindew.x < 1280 and mountaindew.x > 0:
+                time += 0.05
+                po = spurt.spurtpath(x, y, power, angle, time)
+                mountaindew.x = po[0]
+                mountaindew.y = po[1]
+            elif mountaindew.x > 1280 or mountaindew.x < 0:
+                shoot = False
+                mountaindew.y = 556
+                mountaindew.x = 405
+            else:
+                shoot = False
+                mountaindew.y = 556
+                mountaindew.x = 405
+
         pos = pygame.mouse.get_pos()
         line = [(mountaindew.x, mountaindew.y), pos]
         re_draw()
         update()
+        if pygame.mouse.get_pressed()[0]:
+            if shoot == False:
+                shoot = True
+                x = mountaindew.x
+                y = mountaindew.y
+                time = 0
+                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)/4
+                angle = findAngle(pos)
+
 
 def Game_over():
     quit()
