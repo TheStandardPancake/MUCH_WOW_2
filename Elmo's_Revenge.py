@@ -1,6 +1,7 @@
 import sys
 import pygame
 import math
+import random
 from time import sleep
 from pygame.locals import *
 
@@ -67,19 +68,30 @@ class elmo(pygame.sprite.Sprite):
     def display(self):
         global window
         global un_official_score
-        self.rect.x -= un_official_score
+        global Doge
+        if self.rect.x > Doge.rect.x:
+            self.rect.x += random.choice([1,-1,-1])*un_official_score
+        if self.rect.x < Doge.rect.x:
+            self.rect.x += random.choice([1,1,1,1,1,1,-1])*un_official_score
+        if self.rect.y > Doge.rect.y:
+            self.rect.y += random.choice([1,-1,-1])*un_official_score
+        if self.rect.y < Doge.rect.y:
+            self.rect.y += random.choice([1,1,-1])*un_official_score
         window.blit(self.image, self.rect)
 
     def elmo_hit(self):
         if pygame.sprite.collide_mask(self, Doge):
             global playing
-            playing =False
+            playing = False
+            pygame.mixer.music.stop()
+            background_music = pygame.mixer.music.load("Hello_Darkness.wav")
+            pygame.mixer.music.play()
             ending_animation()
         if pygame.sprite.collide_mask(self, dorito):
             global un_official_score
             un_official_score += 1
             self.rect.x = 1280
-            self.rect.y = 670-self.rect.height
+            self.rect.y = random.randrange(0,(670-self.rect.height))
 
 
 
@@ -126,6 +138,36 @@ class play_button(pygame.sprite.Sprite):
         if pygame.mouse.get_pressed()[0] and Mouse_Location_X == True and Mouse_Location_Y == True:
             entry_load()
 
+class replay_button(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('replay.png').convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = width/2-self.rect.width/2
+        self.rect.y = height/2-self.rect.height/2
+
+    def display(self):
+        global window
+        window.blit(self.image, self.rect)
+
+    def sensing_click(self):
+        x,y = pygame.mouse.get_pos()
+        if x >= width/2-self.rect.width/2 and x <= width/2+self.rect.width/2:
+            Mouse_Location_X = True
+        if x < width/2-self.rect.width/2 or x > width/2+self.rect.width/2:
+            Mouse_Location_X = False
+        if y >= height/2-self.rect.height/2 and y <= height/2+self.rect.height/2:
+            Mouse_Location_Y = True
+        if y < height/2-self.rect.height/2 or y > height/2+self.rect.height/2:
+            Mouse_Location_Y = False
+        if Mouse_Location_X == True and Mouse_Location_Y == True:
+            self.image = pygame.image.load('replay2.png').convert_alpha()
+        else:
+            self.image = pygame.image.load('replay.png').convert_alpha()
+        if pygame.mouse.get_pressed()[0] and Mouse_Location_X == True and Mouse_Location_Y == True:
+            entry_load()
+
+
 #this is the curtains opening
 def entry_load():
     #loading in all the slides for the animation + the new background and stuff
@@ -141,9 +183,7 @@ def entry_load():
     slide_9 = pygame.image.load("title9.png").convert_alpha()
     slide_10 = pygame.image.load("title10.png").convert_alpha()
     global doritos_pile
-    doritos_pile = doritos_pile()
     global Doge
-    Doge = the_doge()
     #blitting them in an animation
     global window
     window.blit(level_layout, (0,0))
@@ -276,13 +316,6 @@ def ending_animation():
     sleep(0.1)
     end_screen()
 
-def end_screen():
-    curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
-    while True:
-        window.blit(curtains, (0, 0))
-        update()
-        pygame.display.update()
-
 def update(): #So far this just lets you exit the game and makes everything work for unkown reasons
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -297,6 +330,10 @@ def Title_screen(): #Just a title screen, as the name suggests
     heading = pygame.image.load('proper_title.png').convert_alpha()
     curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
     pygame.display.set_caption("Elmo's Revenge")
+    global doritos_pile
+    doritos_pile = doritos_pile()
+    global Doge
+    Doge = the_doge()
     # Drawing the title screen
     while True:
         window.blit(curtains, (0, 0))
@@ -369,13 +406,12 @@ def Game_Start():
     #the score system
     global un_official_score
     un_official_score = 1
-    timer = 0
-
+    global official_score
+    official_score = un_official_score - 1
     while playing:
-        timer += 0.01
         if shoot:
             if dorito.y < 650 - dorito.rect.width/2 and dorito.x < 1280 and dorito.x > 0:
-                time += 0.3
+                time += 0.2
                 po = dorito_projectile.dorito_projectile_path(x, y, power, angle, time)
                 dorito.x = po[0]
                 dorito.y = po[1]
@@ -406,8 +442,16 @@ def Game_Start():
                 angle = findAngle(pos)
 
 
-def Game_over():
-    quit()
+def end_screen():
+    curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
+    replay = replay_button()
+    while True:
+        window.blit(curtains, (0, 0))
+        replay.display()
+        replay.sensing_click()
+        update()
+        pygame.display.update()
+
 
 if __name__ == '__main__':
     Title_screen()
