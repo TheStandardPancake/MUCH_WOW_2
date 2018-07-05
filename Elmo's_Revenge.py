@@ -13,20 +13,25 @@ height = 720
 
 #Loading in the awesome Music
 background_music = pygame.mixer.music.load("Wake Me Up Inside- Kazoo Cover.wav")
-class spurt(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius, color):
-        pygame.sprite.Sprite
+
+#making a class for the projectile
+class dorito_projectile(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('dorito.png').convert_alpha()
+        self.rect = self.image.get_rect()
         self.x = x
         self.y = y
-        self.radius = radius
-        self.color = color
+        self.rect.x = self.x
+        self.rect.y = self.y
 
     def draw(self, window):
-        pygame.draw.circle(window, (0,0,0), (self.x,self.y), self.radius)
-        pygame.draw.circle(window, self.color, (self.x,self.y), self.radius-1)
+        self.rect.x = self.x
+        self.rect.y = self.y
+        window.blit(self.image, (self.x, self.y))
 
     @staticmethod
-    def spurtpath(startx, starty, power, angle, time):
+    def dorito_projectile_path(startx, starty, power, angle, time):
         velx = math.cos(angle) * power
         vely = math.sin(angle) * power
 
@@ -38,6 +43,7 @@ class spurt(pygame.sprite.Sprite):
 
         return(newx, newy)
 
+#making the doritos pile load in:
 class doritos_pile(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -50,10 +56,34 @@ class doritos_pile(pygame.sprite.Sprite):
         global window
         window.blit(self.image, self.rect)
 
-    def elmo_reached_stash(self):
-        if pygame.sprite.collide_mask(MLG_elmo, doritos_pile):
-            Game_Over()
+#making the elmo Sprite
+class elmo(pygame.sprite.Sprite):
+    def __init__(self):
+        self.image = pygame.image.load("elmo.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = 1280
+        self.rect.y = 670-self.rect.height
 
+    def display(self):
+        global window
+        global un_official_score
+        self.rect.x -= un_official_score
+        window.blit(self.image, self.rect)
+
+    def elmo_hit(self):
+        if pygame.sprite.collide_mask(self, Doge):
+            global playing
+            playing =False
+            ending_animation()
+        if pygame.sprite.collide_mask(self, dorito):
+            global un_official_score
+            un_official_score += 1
+            self.rect.x = 1280
+            self.rect.y = 670-self.rect.height
+
+
+
+#making the doge Sprite
 class the_doge(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -66,6 +96,7 @@ class the_doge(pygame.sprite.Sprite):
         global window
         window.blit(self.image, self.rect)
 
+#the play button on title screen
 class play_button(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -95,6 +126,7 @@ class play_button(pygame.sprite.Sprite):
         if pygame.mouse.get_pressed()[0] and Mouse_Location_X == True and Mouse_Location_Y == True:
             entry_load()
 
+#this is the curtains opening
 def entry_load():
     #loading in all the slides for the animation + the new background and stuff
     level_layout = pygame.image.load('background.png').convert_alpha()
@@ -177,8 +209,81 @@ def entry_load():
     sleep(0.1)
     Game_Start()
 
+#Thi is the ending animation of curtains closing
+def ending_animation():
+    blackness = pygame.image.load('black1.png').convert_alpha()
+    slide_1 = pygame.image.load("title1.png").convert_alpha()
+    slide_2 = pygame.image.load("title2.png").convert_alpha()
+    slide_3 = pygame.image.load("title3.png").convert_alpha()
+    slide_4 = pygame.image.load("title4.png").convert_alpha()
+    slide_5 = pygame.image.load("title5.png").convert_alpha()
+    slide_6 = pygame.image.load("title6.png").convert_alpha()
+    slide_7 = pygame.image.load("title7.png").convert_alpha()
+    slide_8 = pygame.image.load("title8.png").convert_alpha()
+    slide_9 = pygame.image.load("title9.png").convert_alpha()
+    slide_10 = pygame.image.load("title10.png").convert_alpha()
+    #blitting them in an animation
+    global window
+    window.blit(blackness, (0,0))
+    window.blit(slide_10, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_9, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_8, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_7, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_6, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_5, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_4, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_3, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_2, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    window.blit(blackness, (0,0))
+    window.blit(slide_1, (0,0))
+    update()
+    pygame.display.update()
+    sleep(0.1)
+    end_screen()
 
-def update(): #So far this just lets you exit the game
+def end_screen():
+    curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
+    while True:
+        window.blit(curtains, (0, 0))
+        update()
+        pygame.display.update()
+
+def update(): #So far this just lets you exit the game and makes everything work for unkown reasons
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
@@ -207,13 +312,15 @@ def re_draw():
     window.blit(level_layout, (0,0))
     Doge.display()
     doritos_pile.display()
-    mountaindew.draw(window)
-
+    dorito.draw(window)
+    crawling_elmo.display()
+    crawling_elmo.elmo_hit()
     pygame.display.update()
 
+#this is used to find the angle at which the projectile is launched
 def findAngle(pos):
-    sX = mountaindew.x
-    sY = mountaindew.y
+    sX = dorito.x
+    sY = dorito.y
     try:
         angle = math.atan((sY - pos[1]) / (sX - pos[0]))
     except:
@@ -230,18 +337,24 @@ def findAngle(pos):
 
     return angle
 
-
+#contains the main game loop
 def Game_Start():
+    global playing
+    playing = True
+    #dealing with music stuff
     pygame.mixer.music.stop()
     background_music = pygame.mixer.music.load("KazooSandstorm.wav")
     pygame.mixer.music.play(-1)
+
+    #setting up the background image
     global level_layout
     level_layout = pygame.image.load('background.png').convert_alpha()
-    global mountaindew
-    mountaindew = spurt(405, 556,  5, (34,245,34))
+
+    #making the projectile + its variables
+    global dorito
+    dorito = dorito_projectile(402, 553)
     global line
     global pos
-    #defining variables to make the mountaindew shoot
     x = 0
     y = 0
     time = 0
@@ -249,34 +362,47 @@ def Game_Start():
     angle = 0
     shoot = False
 
-    while True:
+    #Making elmo enemy
+    global crawling_elmo
+    crawling_elmo = elmo()
 
+    #the score system
+    global un_official_score
+    un_official_score = 1
+    timer = 0
+
+    while playing:
+        timer += 0.01
         if shoot:
-            if mountaindew.y < 650 - mountaindew.radius and mountaindew.x < 1280 and mountaindew.x > 0:
-                time += 0.5
-                po = spurt.spurtpath(x, y, power, angle, time)
-                mountaindew.x = po[0]
-                mountaindew.y = po[1]
-            elif mountaindew.x > 1280 or mountaindew.x < 0:
+            if dorito.y < 650 - dorito.rect.width/2 and dorito.x < 1280 and dorito.x > 0:
+                time += 0.3
+                po = dorito_projectile.dorito_projectile_path(x, y, power, angle, time)
+                dorito.x = po[0]
+                dorito.y = po[1]
+            elif dorito.x > 1280 or dorito.x < 0:
                 shoot = False
-                mountaindew.y = 556
-                mountaindew.x = 405
+                dorito.y = 553
+                dorito.x = 402
+            elif pygame.sprite.collide_mask(dorito, crawling_elmo):
+                shoot = False
+                dorito.y = 553
+                dorito.x = 402
             else:
                 shoot = False
-                mountaindew.y = 556
-                mountaindew.x = 405
+                dorito.y = 553
+                dorito.x = 402
 
         pos = pygame.mouse.get_pos()
-        line = [(mountaindew.x, mountaindew.y), pos]
+        line = [(dorito.x, dorito.y), pos]
         re_draw()
         update()
         if pygame.mouse.get_pressed()[0]:
             if shoot == False:
                 shoot = True
-                x = mountaindew.x
-                y = mountaindew.y
+                x = dorito.x
+                y = dorito.y
                 time = 0
-                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)/8
+                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)/6
                 angle = findAngle(pos)
 
 
