@@ -253,7 +253,7 @@ def Game_Start():
 
         if shoot:
             if mountaindew.y < 650 - mountaindew.radius and mountaindew.x < 1280 and mountaindew.x > 0:
-                time += 0.05
+                time += 0.5
                 po = spurt.spurtpath(x, y, power, angle, time)
                 mountaindew.x = po[0]
                 mountaindew.y = po[1]
@@ -276,7 +276,7 @@ def Game_Start():
                 x = mountaindew.x
                 y = mountaindew.y
                 time = 0
-                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)/4
+                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)/8
                 angle = findAngle(pos)
 
 
