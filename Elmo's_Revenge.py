@@ -25,11 +25,27 @@ class dorito_projectile(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = self.x
         self.rect.y = self.y
+        global blip
+        global blop
+        blip = 0
+        blop = 0
 
     def draw(self, window):
         self.rect.x = self.x
         self.rect.y = self.y
-        window.blit(self.image, (self.x, self.y))
+        window.blit(self.image, self.rect)
+
+    def super(self):
+        global blip
+        global blop
+        blip += 1
+        if blip == 20:
+            blop += 1
+            blip = 0
+        if blop % 2 == 0:
+            self.image = pygame.image.load('super_dorito.png')
+        else:
+           self.image = pygame.image.load('dorito.png')
 
     @staticmethod
     def dorito_projectile_path(startx, starty, power, angle, time):
@@ -60,6 +76,7 @@ class doritos_pile(pygame.sprite.Sprite):
 #making the elmo Sprite
 class elmo(pygame.sprite.Sprite):
     def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("elmo.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.x = 1280
@@ -70,30 +87,93 @@ class elmo(pygame.sprite.Sprite):
         global un_official_score
         global Doge
         if self.rect.x > Doge.rect.x:
-            self.rect.x += random.choice([1,-1,-1])*un_official_score
+            self.rect.x += random.choice([1,-1,-1,-1])*un_official_score
         if self.rect.x < Doge.rect.x:
-            self.rect.x += random.choice([1,1,1,1,1,1,-1])*un_official_score
+            self.rect.x += 1*un_official_score
         if self.rect.y > Doge.rect.y:
             self.rect.y += random.choice([1,-1,-1])*un_official_score
         if self.rect.y < Doge.rect.y:
             self.rect.y += random.choice([1,1,-1])*un_official_score
         window.blit(self.image, self.rect)
 
-    def elmo_hit(self):
+    def collisions(self):
         if pygame.sprite.collide_mask(self, Doge):
             global playing
             playing = False
             pygame.mixer.music.stop()
-            background_music = pygame.mixer.music.load("Hello_Darkness.wav")
-            pygame.mixer.music.play()
+            background_music = pygame.mixer.music.load("sad_violin.mp3")
+            pygame.mixer.music.play(-1)
             ending_animation()
+            game_over_screen()
         if pygame.sprite.collide_mask(self, dorito):
             global un_official_score
             un_official_score += 1
             self.rect.x = 1280
             self.rect.y = random.randrange(0,(670-self.rect.height))
 
+class elmo_boss(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("boss_elmo.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = 1280
+        self.rect.y = 720-self.rect.height
+        self.hit_counter = 0
+        self.alive = True
+        self.music = True
 
+    def display(self):
+        global window
+        self.rect.x -= 1
+        window.blit(self.image, self.rect)
+        while self.music == True:
+            pygame.mixer.music.stop()
+            background_music = pygame.mixer.music.load("Hello_Darkness.wav")
+            pygame.mixer.music.play(-1)
+            self.music = False
+
+    def collisions(self):
+        global panic_attack
+        if pygame.sprite.collide_mask(self, Doge):
+            global playing
+            playing = False
+            ending_animation()
+            game_over_screen()
+        if pygame.sprite.collide_mask(self, dorito) and panic_attack == False:
+            self.hit_counter += 1
+        elif pygame.sprite.collide_mask(self, dorito) and panic_attack == True:
+            self.hit_counter += 50
+        if self.hit_counter >= 5000:
+            self.alive = False
+            ending_animation()
+            win_screen()
+
+#panic button, for when the going gets tough
+class panic_button(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("panic_button.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.x = 50
+        self.rect.y = 50
+
+    def display(self):
+        global window
+        window.blit(self.image, self.rect)
+
+    def sensing_click(self):
+        x,y = pygame.mouse.get_pos()
+        if x >= self.rect.x and x <= self.rect.x+self.rect.width:
+            Mouse_Location_X = True
+        if x < self.rect.x or x > self.rect.x+self.rect.width:
+            Mouse_Location_X = False
+        if y >= self.rect.y and y <= self.rect.y+self.rect.height:
+            Mouse_Location_Y = True
+        if y < self.rect.y or y > self.rect.y+self.rect.height:
+            Mouse_Location_Y = False
+        if pygame.mouse.get_pressed()[0] and Mouse_Location_X == True and Mouse_Location_Y == True:
+            global panic_attack
+            panic_attack = True
 
 #making the doge Sprite
 class the_doge(pygame.sprite.Sprite):
@@ -137,6 +217,7 @@ class play_button(pygame.sprite.Sprite):
             self.image = pygame.image.load('start_button.png').convert_alpha()
         if pygame.mouse.get_pressed()[0] and Mouse_Location_X == True and Mouse_Location_Y == True:
             entry_load()
+            Game_Start()
 
 class replay_button(pygame.sprite.Sprite):
     def __init__(self):
@@ -166,6 +247,7 @@ class replay_button(pygame.sprite.Sprite):
             self.image = pygame.image.load('replay.png').convert_alpha()
         if pygame.mouse.get_pressed()[0] and Mouse_Location_X == True and Mouse_Location_Y == True:
             entry_load()
+            Game_Start()
 
 
 #this is the curtains opening
@@ -247,7 +329,6 @@ def entry_load():
     update()
     pygame.display.update()
     sleep(0.1)
-    Game_Start()
 
 #Thi is the ending animation of curtains closing
 def ending_animation():
@@ -314,7 +395,6 @@ def ending_animation():
     update()
     pygame.display.update()
     sleep(0.1)
-    end_screen()
 
 def update(): #So far this just lets you exit the game and makes everything work for unkown reasons
     for event in pygame.event.get():
@@ -349,9 +429,19 @@ def re_draw():
     window.blit(level_layout, (0,0))
     Doge.display()
     doritos_pile.display()
-    dorito.draw(window)
-    crawling_elmo.display()
-    crawling_elmo.elmo_hit()
+    if un_official_score <= 25:
+        crawling_elmo.display()
+    crawling_elmo.collisions()
+    if un_official_score > 25 and boss_elmo.alive == True:
+        panic.display()
+        panic.sensing_click()
+        boss_elmo.display()
+    if panic_attack == True:
+        dorito.super()
+        dorito.draw(window)
+    elif panic_attack == False:
+        dorito.draw(window)
+    boss_elmo.collisions()
     pygame.display.update()
 
 #this is used to find the angle at which the projectile is launched
@@ -406,24 +496,41 @@ def Game_Start():
     #the score system
     global un_official_score
     un_official_score = 1
-    global official_score
-    official_score = un_official_score - 1
+
+    #Making boss_elmo
+    global boss_elmo
+    boss_elmo = elmo_boss()
+
+    #panic Button
+    global panic
+    panic = panic_button()
+    global panic_attack
+    panic_attack = False
+
     while playing:
         if shoot:
             if dorito.y < 650 - dorito.rect.width/2 and dorito.x < 1280 and dorito.x > 0:
-                time += 0.2
+                time += 0.05
                 po = dorito_projectile.dorito_projectile_path(x, y, power, angle, time)
                 dorito.x = po[0]
                 dorito.y = po[1]
-            elif dorito.x > 1280 or dorito.x < 0:
-                shoot = False
-                dorito.y = 553
-                dorito.x = 402
-            elif pygame.sprite.collide_mask(dorito, crawling_elmo):
-                shoot = False
-                dorito.y = 553
-                dorito.x = 402
             else:
+                shoot = False
+                dorito.y = 553
+                dorito.x = 402
+            if dorito.x > 1280 or dorito.x < 0:
+                shoot = False
+                dorito.y = 553
+                dorito.x = 402
+            if dorito.y > 720 or dorito.y < 0:
+                shoot = False
+                dorito.y = 553
+                dorito.x = 402
+            if pygame.sprite.collide_mask(dorito, crawling_elmo):
+                shoot = False
+                dorito.y = 553
+                dorito.x = 402
+            if pygame.sprite.collide_mask(dorito, boss_elmo):
                 shoot = False
                 dorito.y = 553
                 dorito.x = 402
@@ -438,17 +545,27 @@ def Game_Start():
                 x = dorito.x
                 y = dorito.y
                 time = 0
-                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)/6
+                power = math.sqrt((line[1][1] - line[0][1])**2 + (line[1][0] - line[0][0])**2)
                 angle = findAngle(pos)
 
 
-def end_screen():
+def game_over_screen():
     curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
     replay = replay_button()
     while True:
         window.blit(curtains, (0, 0))
         replay.display()
         replay.sensing_click()
+        update()
+        pygame.display.update()
+
+def win_screen():
+    curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
+    pygame.mixer.music.stop()
+    background_music = pygame.mixer.music.load("kazoo_kid_trap_remix.wav")
+    pygame.mixer.music.play(-1)
+    while True:
+        window.blit(curtains, (0, 0))
         update()
         pygame.display.update()
 
