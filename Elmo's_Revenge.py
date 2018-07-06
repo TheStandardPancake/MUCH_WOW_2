@@ -264,7 +264,7 @@ def entry_load():
     slide_8 = pygame.image.load("title8.png").convert_alpha()
     slide_9 = pygame.image.load("title9.png").convert_alpha()
     slide_10 = pygame.image.load("title10.png").convert_alpha()
-    global doritos_pile
+    global doritospile
     global Doge
     #blitting them in an animation
     global window
@@ -296,35 +296,35 @@ def entry_load():
     sleep(0.1)
     window.blit(level_layout, (0,0))
     Doge.display()
-    doritos_pile.display()
+    doritospile.display()
     window.blit(slide_6, (0,0))
     update()
     pygame.display.update()
     sleep(0.1)
     window.blit(level_layout, (0,0))
     Doge.display()
-    doritos_pile.display()
+    doritospile.display()
     window.blit(slide_7, (0,0))
     update()
     pygame.display.update()
     sleep(0.1)
     window.blit(level_layout, (0,0))
     Doge.display()
-    doritos_pile.display()
+    doritospile.display()
     window.blit(slide_8, (0,0))
     update()
     pygame.display.update()
     sleep(0.1)
     window.blit(level_layout, (0,0))
     Doge.display()
-    doritos_pile.display()
+    doritospile.display()
     window.blit(slide_9, (0,0))
     update()
     pygame.display.update()
     sleep(0.1)
     window.blit(level_layout, (0,0))
     Doge.display()
-    doritos_pile.display()
+    doritospile.display()
     window.blit(slide_10, (0,0))
     update()
     pygame.display.update()
@@ -410,8 +410,8 @@ def Title_screen(): #Just a title screen, as the name suggests
     heading = pygame.image.load('proper_title.png').convert_alpha()
     curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
     pygame.display.set_caption("Elmo's Revenge")
-    global doritos_pile
-    doritos_pile = doritos_pile()
+    global doritospile
+    doritospile = doritos_pile()
     global Doge
     Doge = the_doge()
     # Drawing the title screen
@@ -428,7 +428,7 @@ def re_draw():
     pygame.draw.line(window, (0,0,0), line[0], line[1])
     window.blit(level_layout, (0,0))
     Doge.display()
-    doritos_pile.display()
+    doritospile.display()
     if un_official_score <= 25:
         crawling_elmo.display()
     crawling_elmo.collisions()
@@ -561,11 +561,13 @@ def game_over_screen():
 
 def win_screen():
     curtains = pygame.image.load('the_initial_title_screen.png').convert_alpha()
+    win_banner = pygame.image.load("win_banner.png").convert_alpha()
     pygame.mixer.music.stop()
     background_music = pygame.mixer.music.load("kazoo_kid_trap_remix.wav")
     pygame.mixer.music.play(-1)
     while True:
         window.blit(curtains, (0, 0))
+        window.blit(win_banner, (width/2, 150))
         update()
         pygame.display.update()
 
