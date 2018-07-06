@@ -1,3 +1,8 @@
+#This game, like the first MUCH WOW, was programmed entirely by Boyd Kirkman
+#Feel free to add to it or change it up to suit your needs
+
+
+
 import sys
 import pygame
 import math
@@ -144,7 +149,11 @@ class elmo_boss(pygame.sprite.Sprite):
         elif pygame.sprite.collide_mask(self, dorito) and panic_attack == True:
             self.hit_counter += 50
         if self.hit_counter >= 5000:
+            global window
             self.alive = False
+            self.image = pygame.image.load("boss_elmo_dead.png").convert_alpha()
+            window.blit(self.image, self.rect)
+            pygame.display.update()
             ending_animation()
             win_screen()
 
@@ -429,10 +438,11 @@ def re_draw():
     window.blit(level_layout, (0,0))
     Doge.display()
     doritospile.display()
-    if un_official_score <= 30:
+    if un_official_score <= 25:
         crawling_elmo.display()
     crawling_elmo.collisions()
-    if un_official_score > 30 and boss_elmo.alive == True:
+    boss_elmo.collisions()
+    if un_official_score > 25 and boss_elmo.alive == True:
         panic.display()
         panic.sensing_click()
         boss_elmo.display()
@@ -441,7 +451,6 @@ def re_draw():
         dorito.draw(window)
     elif panic_attack == False:
         dorito.draw(window)
-    boss_elmo.collisions()
     pygame.display.update()
 
 #this is used to find the angle at which the projectile is launched
