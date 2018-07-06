@@ -39,13 +39,13 @@ class dorito_projectile(pygame.sprite.Sprite):
         global blip
         global blop
         blip += 1
-        if blip == 20:
+        if blip == 10:
             blop += 1
             blip = 0
         if blop % 2 == 0:
             self.image = pygame.image.load('super_dorito.png')
         else:
-           self.image = pygame.image.load('dorito.png')
+           self.image = pygame.image.load('dorito1.png')
 
     @staticmethod
     def dorito_projectile_path(startx, starty, power, angle, time):
@@ -429,10 +429,10 @@ def re_draw():
     window.blit(level_layout, (0,0))
     Doge.display()
     doritospile.display()
-    if un_official_score <= 25:
+    if un_official_score <= 30:
         crawling_elmo.display()
     crawling_elmo.collisions()
-    if un_official_score > 25 and boss_elmo.alive == True:
+    if un_official_score > 30 and boss_elmo.alive == True:
         panic.display()
         panic.sensing_click()
         boss_elmo.display()
@@ -526,10 +526,6 @@ def Game_Start():
                 shoot = False
                 dorito.y = 553
                 dorito.x = 402
-            if pygame.sprite.collide_mask(dorito, crawling_elmo):
-                shoot = False
-                dorito.y = 553
-                dorito.x = 402
             if pygame.sprite.collide_mask(dorito, boss_elmo):
                 shoot = False
                 dorito.y = 553
@@ -567,7 +563,7 @@ def win_screen():
     pygame.mixer.music.play(-1)
     while True:
         window.blit(curtains, (0, 0))
-        window.blit(win_banner, (width/2, 150))
+        window.blit(win_banner, (width/2-win_banner.get_rect().width/2, 150))
         update()
         pygame.display.update()
 
